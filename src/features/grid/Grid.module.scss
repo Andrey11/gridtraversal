@@ -1,0 +1,36 @@
+@import 'src/index.module.scss';
+
+.GridWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.Grid {
+  display: flex;
+  flex: 1;
+  flex-flow: row wrap;
+  width: min-content;
+  height: min-content;
+  min-width: 50px;
+  background-color: $c_background;
+  @include createGridSizes(10);
+
+  &Lines {
+    position: absolute;
+
+    line {
+      stroke: $c_primary;
+      stroke-width: 1px;
+      stroke-opacity: 0.4;
+      stroke-dasharray: 3, 2;
+    }
+  }
+
+  &Boundary {
+    background-color: $c_primary;
+    padding: 2px;
+    margin: 2em;
+  }
+}
