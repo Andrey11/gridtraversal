@@ -1,0 +1,94 @@
+@import 'src/index.module.scss';
+
+.Btn {
+  display: inline-block;
+  cursor: pointer;
+  box-shadow: inset 0px 1px 0px 0px $c_on_primary;
+  border: 1px solid #3866a3;
+  border-radius: 6px;
+  background-color: $c_primary;
+  color: $c_on_primary;
+  text-shadow: 0px 1px 0px #0075ff;
+  outline: none;
+  @include textProps(0.85rem);
+  padding: 6px 24px;
+  text-decoration: none;
+
+  &:hover {
+    background-color: #e9e9e9;
+  }
+
+  &:active {
+    position: relative;
+    top: 1px;
+  }
+
+  &Secondary {
+    background-color: $c_secondary_btn;
+    border: 1px solid $c_border;
+    color: $c_primary;
+    text-shadow: 0px 1px 0px $c_background;
+    box-shadow: inset 0px 1px 0px 0px rgba($c_background, 0.9);
+
+    &:hover {
+      background-color: $c_secondary;
+      border-color: $c_border_hover;
+    }
+  }
+
+  &Primary:hover {
+    background-color: $c_primary_active;
+    border-color: $c_border_hover;
+  }
+
+  &Icon {
+    padding: 0 6px 2px 5px;
+    box-shadow: none;
+    background-color: $c_primary;
+    border: 2px solid $c_transparent;
+    color: $c_on_primary;
+    font-size: 20px;
+    font-weight: 700;
+    text-shadow: none;
+    border-radius: 15px;
+
+    &.on {
+      color: $c_background;
+      border: 2px solid $c_on_primary;
+    }
+
+    &:hover {
+      color: $c_primary;
+      background-color: $c_on_primary;
+      border: 2px solid $c_primary;
+    }
+
+    &:active {
+      top: 0;
+    }
+  }
+}
+
+// ---------------------- HEADER -----------------------
+.ScreenHeader {
+  height: 50px;
+  text-align: center;
+  @include textProps(1.25rem);
+  background-color: $c_primary;
+  color: $c_on_primary;
+  box-shadow: 0 15px 10px -15px $c_box_shadow;
+  line-height: 50px;
+
+  header {
+    display: flex;
+    align-items: center;
+
+    button {
+      margin-left: 10px;
+    }
+  }
+
+  label {
+    flex: 1;
+  }
+}

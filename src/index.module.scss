@@ -1,0 +1,882 @@
+@import "~bootstrap/scss/bootstrap";
+
+$c_primary: rgba(50, 129, 167, 1);
+$c_primary_active: rgba(0, 117, 255, 1);
+$c_on_primary: rgba(207, 234, 255, 1);
+
+$c_border: rgba(0, 146, 255, 1);
+$c_border_hover: rgba(0, 104, 255, 1);
+$c_border_focus: rgba(0, 104, 255, 1);
+
+$c_secondary: rgba(234, 242, 246, 1);
+$c_secondary_btn: rgb(218, 232, 239);
+$c_transparent: rgba(255, 255, 255, 0.01);
+$c_background: rgba(254, 254, 254, 1);
+
+$c_box_shadow: rgba(17, 17, 17, 0.2);
+
+$cell_width: 50px;
+$cell_height: 50px;
+
+$dim_result_stats_on_menu_open: 0.3;
+
+@mixin createTransition($trasitionProp, $duration) {
+  -webkit-transition: $trasitionProp, $duration linear;
+  -moz-transition: $trasitionProp, $duration linear;
+  -ms-transition: $trasitionProp, $duration linear;
+  -o-transition: $trasitionProp, $duration linear;
+  transition: $trasitionProp, $duration linear;
+}
+
+@mixin createGridBox($size) {
+  min-width: $size * $cell_width;
+}
+
+@mixin createGridSizes($sizes) {
+  @for $i from 1 through $sizes {
+    &.width__#{$i} {
+      @include createGridBox($i);
+    }
+  }
+}
+
+@mixin cellContent($val) {
+  .CellInfo:after {
+    color: $c_primary;
+    content: $val;
+  }
+}
+
+@mixin lineStrokeProps($name) {
+  &.#{$name} {
+    .Direction__#{$name} {
+      stroke-opacity: 1;
+      @include createTransition(stroke-opacity, 0.5s);
+      transition-delay: 0.2s;
+    }
+    &.#{$name}-hovered {
+      .Direction__#{$name} {
+        stroke-opacity: 0.7;
+        stroke-dasharray: 3, 2;
+      }
+    }
+  }
+  &.#{$name}-hovered {
+    .Direction__#{$name} {
+      stroke-opacity: 0.3;
+      stroke-dasharray: 3, 2;
+    }
+  }
+}
+
+@mixin createDelayTransitions($count) {
+  @for $i from 0 through $count {
+    &.pos-#{$i} {
+      transition-delay: 0.05s + 0.025 * $i;
+    }
+  }
+}
+
+@mixin defaultBorderProps($horizontal: true) {
+  position: absolute;
+  background-color: $c_transparent;
+
+  @if $horizontal {
+    width: 50px;
+    height: 2px;
+  } @else {
+    width: 2px;
+    height: 50px;
+  }
+}
+
+@mixin borderHoverProps($cls, $borderProp) {
+  &:not([class*="#{$cls}"]) .#{$borderProp}:hover {
+    @include defaultBorderHoverProps();
+    @content;
+  }
+}
+
+@mixin borderColorProps($property, $border_color) {
+  .Border#{$property} {
+    background-color: $border_color;
+  }
+}
+
+@mixin defaultBorderHoverProps() {
+  background-color: $c_primary_active;
+  border: 1px solid $c_primary;
+  border-radius: 15px;
+}
+
+@mixin textProps($textSize: 1rem) {
+  font: $textSize "Fira Sans", "Trebuchet MS", sans-serif;
+}
+
+@mixin addPathResizeWidth($pathWidth, $offset) {
+  &-#{$pathWidth} {
+    .pathDirection {
+      span {
+        margin-left: -($offset);
+        &:hover {
+          // margin-left: 0;
+          margin-right: $offset;
+        }
+        &:first-child {
+          margin-left: 0;
+        }
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}
+
+@mixin unselectable() {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @include textProps();
+  height: 100vh;
+  overflow: hidden;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.DisplayNumber {
+  @include textProps(1.5rem);
+  text-align: center;
+  color: $c_primary_active;
+}
+
+input[type="number"] {
+  height: 24px;
+  max-width: 40px;
+  min-width: 30px;
+  width: auto;
+  @include textProps();
+  padding-left: 3px;
+  border: 1px solid $c_border;
+  border-radius: 3px;
+  color: $c_primary_active;
+
+  &:hover {
+    border-color: $c_border_hover;
+  }
+
+  &:focus,
+  &:active {
+    border-color: $c_border_focus;
+    outline: 1px auto $c_border_focus;
+  }
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  opacity: 0.7;
+}
+
+// ---------------------- BUTTONS -----------------------
+.btn {
+  display: inline-block;
+  cursor: pointer;
+  box-shadow: inset 0px 1px 0px 0px $c_on_primary;
+  border: 1px solid #3866a3;
+  border-radius: 6px;
+  background-color: $c_primary;
+  color: $c_on_primary;
+  text-shadow: 0px 1px 0px #0075ff;
+  outline: none;
+  @include textProps(0.85rem);
+  padding: 6px 24px;
+  text-decoration: none;
+
+  &:hover {
+    background-color: #e9e9e9;
+  }
+
+  &:active {
+    position: relative;
+    top: 1px;
+  }
+
+  &-secondary {
+    background-color: $c_secondary_btn;
+    border: 1px solid $c_border;
+    color: $c_primary;
+    text-shadow: 0px 1px 0px $c_background;
+    box-shadow: inset 0px 1px 0px 0px rgba($c_background, 0.9);
+
+    &:hover {
+      background-color: $c_secondary;
+      border-color: $c_border_hover;
+    }
+  }
+
+  &-primary:hover {
+    background-color: $c_primary_active;
+    border-color: $c_border_hover;
+  }
+
+  &-icon {
+    padding: 0 6px 2px 5px;
+    box-shadow: none;
+    background-color: $c_primary;
+    border: 2px solid $c_transparent;
+    color: $c_on_primary;
+    font-size: 20px;
+    font-weight: 700;
+    text-shadow: none;
+    border-radius: 15px;
+
+    &.on {
+      color: $c_background;
+      border: 2px solid $c_on_primary;
+    }
+
+    &:hover {
+      color: $c_primary;
+      background-color: $c_on_primary;
+      border: 2px solid $c_primary;
+    }
+
+    &:active {
+      top: 0;
+    }
+  }
+}
+
+// ---------------------- HEADER -----------------------
+// .ScreenHeader {
+//   height: 50px;
+//   text-align: center;
+//   @include textProps(1.25rem);
+//   background-color: $c_primary;
+//   color: $c_on_primary;
+//   box-shadow: 0 15px 10px -15px $c_box_shadow;
+//   line-height: 50px;
+
+//   header {
+//     display: flex;
+//     align-items: center;
+
+//     button {
+//       margin-left: 10px;
+//     }
+//   }
+
+//   label {
+//     flex: 1;
+//   }
+// }
+
+// ---------------------- SCREEN -----------------------
+.Screen {
+  display: flex;
+  height: calc(100vh - 50px);
+  border-right: 1px solid $c_primary;
+  border-left: 1px solid $c_primary;
+}
+
+// ---------------------- MENU -----------------------
+.menu {
+  margin-left: -260px;
+  min-width: 260px;
+
+  @include createTransition(margin-left, 0.3s);
+
+  &.open {
+    border-right: 1px solid $c_primary;
+    box-shadow: 12px -8px 4px -10px $c_box_shadow;
+    margin-left: 0;
+    @include createTransition(margin-left, 0.3s);
+  }
+}
+
+// ---------------------- FORM -----------------------
+form {
+  margin: 30px 10px 10px 10px;
+
+  .inputSection,
+  .radioGroupSection {
+    height: 80px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    color: $c_primary;
+
+    & > label {
+      @include textProps();
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba($c_primary, 0.5);
+    }
+
+    .radioOption {
+      margin-top: 10px;
+      @include textProps(0.9rem);
+    }
+  }
+
+  .radioGroupWrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .inputContainer {
+    margin: 10px 0 0 0;
+
+    span {
+      color: rgba($c_primary, 0.7);
+    }
+
+    input[type="range"] {
+      min-width: 10px;
+      width: 200px;
+    }
+  }
+
+  .buttonSection {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+// ---------------------- PAGE -----------------------
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+// ---------------------- TRAVERSE CONTROLS -----------------------
+.controls {
+  text-align: -webkit-center;
+
+  .loader {
+    display: none;
+  }
+
+  &.searching {
+    .btn {
+      display: none;
+    }
+
+    .loader {
+      display: block;
+    }
+  }
+}
+
+// ---------------------- GRID -----------------------
+// .gridWrapper {
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   align-items: center;
+// }
+
+// .Grid {
+//   display: flex;
+//   flex: 1;
+//   flex-flow: row wrap;
+//   width: min-content;
+//   height: min-content;
+//   min-width: 50px;
+//   background-color: $c_background;
+//   @include createGridSizes(10);
+
+//   &-lines {
+//     position: absolute;
+
+//     line {
+//       stroke: $c_primary;
+//       stroke-width: 1px;
+//       stroke-opacity: 0.4;
+//       stroke-dasharray: 3, 2;
+//     }
+//   }
+
+//   &-boundary {
+//     background-color: $c_primary;
+//     padding: 2px;
+//     margin: 2em;
+//   }
+// }
+
+// ---------------------- CELL -----------------------
+// .cell {
+//   min-width: 50px;
+//   min-height: 50px;
+//   max-width: 50px;
+//   max-height: 50px;
+//   text-align: center;
+//   line-height: 50px;
+//   display: grid;
+
+//   &-info {
+//     z-index: 0;
+//     .cell-value {
+//       position: absolute;
+//       z-index: 1;
+//       opacity: 0;
+//       background-color: $c_on_primary;
+//       color: $c_primary;
+//       border: 1px solid $c_primary;
+//       border-radius: 25px;
+//       text-align: center;
+//       padding: 1px 6px;
+//     }
+
+//     .positionLabel {
+//       position: absolute;
+//       opacity: 0.2;
+//       z-index: 2;
+//       font-size: 0.5rem;
+//       line-height: 0.5rem;
+//       border: 1px solid rgba(209, 239, 209, 1);
+//       border-radius: 5px;
+//       color: black;
+//       background-color: rgba(209, 239, 209, 1);
+//       margin: 3px 8px 0;
+//       text-align: center;
+//       max-width: 30px;
+//       width: 100%;
+//     }
+
+//     &:hover {
+//       .positionLabel {
+//         opacity: 0.7;
+//       }
+//     }
+//   }
+// }
+
+  // .direction-info {
+  //   position: absolute;
+  //   width: $cell_width;
+  //   height: $cell_height;
+  //   z-index: 0;
+
+  //   line {
+  //     @include createTransition(stroke-opacity, 0.2s);
+  //     stroke: $c_primary;
+  //     stroke-width: 2px;
+  //     stroke-opacity: 0;
+  //   }
+
+  //   @include lineStrokeProps("up");
+  //   @include lineStrokeProps("right");
+  //   @include lineStrokeProps("down");
+  //   @include lineStrokeProps("left");
+  // }
+
+  // &:not([class*="path-"]) {
+  //   @include cellContent("\026AC");
+  //   &.hovered {
+  //     @include cellContent("\02726");
+  //   }
+
+  //   &.start-cell {
+  //     @include cellContent("\02690");
+  //   }
+
+  //   &.end-cell {
+  //     @include cellContent("\02691");
+  //   }
+
+  //   &.start-cell.end-cell {
+  //     @include cellContent("\02690\02691");
+  //   }
+  // }
+
+//   &[class*="path"] {
+//     background-color: $c_transparent;
+//     color: $c_primary;
+
+//     .cell-info {
+//       span.cell-value {
+//         @include createTransition(opacity, 0.2s);
+//         display: inline;
+//         position: static;
+//         opacity: 0;
+//       }
+//       span.cell-value.selected {
+//         opacity: 1;
+//         @include createTransition(opacity, 0.4s);
+//         &[class*="pos-"] {
+//           transition-delay: 0.6s;
+//         }
+//         @include createDelayTransitions(100);
+//       }
+//     }
+
+//     &.start-cell {
+//       .cell-info {
+//         span {
+//           background-color: $c_background;
+//           color: $c_primary;
+//         }
+//       }
+//     }
+
+//     &.end-cell {
+//       .cell-info {
+//         span {
+//           background-color: $c_primary;
+//           color: $c_on_primary;
+//         }
+//       }
+//     }
+//   }
+// }
+
+// .border {
+//   width: $cell_width;
+//   height: $cell_height;
+//   z-index: 5;
+
+//   @include borderHoverProps("uWall--boundary", "border-top") {
+//     height: 8px;
+//     margin-top: -5px;
+//   }
+
+//   @include borderHoverProps("dWall--boundary", "border-bottom") {
+//     margin-top: 45px;
+//     height: 8px;
+//   }
+
+//   @include borderHoverProps("lWall--boundary", "border-left") {
+//     margin-left: -5px;
+//     width: 8px;
+//   }
+
+//   @include borderHoverProps("rWall--boundary", "border-right") {
+//     margin-left: 45px;
+//     width: 8px;
+//   }
+
+//   &.lWall {
+//     @include borderColorProps("left", $c_primary);
+//   }
+
+//   &.rWall {
+//     @include borderColorProps("right", $c_primary);
+//   }
+
+//   &.uWall {
+//     @include borderColorProps("top", $c_primary);
+//   }
+
+//   &.dWall {
+//     @include borderColorProps("bottom", $c_primary);
+//   }
+
+//   &-left {
+//     @include defaultBorderProps($horizontal: false);
+//   }
+
+//   &-top {
+//     @include defaultBorderProps($horizontal: true);
+//   }
+
+//   &-bottom {
+//     @include defaultBorderProps($horizontal: true);
+//     margin-top: 48px;
+//   }
+
+//   &-right {
+//     @include defaultBorderProps($horizontal: false);
+//     margin-left: 48px;
+//   }
+// }
+
+// ---------------------- RESULTS -----------------------
+.result-previous {
+  z-index: 9;
+  position: absolute;
+  margin-right: 20px;
+  right: 0;
+  margin-top: 30px;
+  color: $c_primary;
+  @include textProps();
+  text-align: end;
+
+  div.traversal-row {
+    @include textProps(0.8rem);
+    text-transform: uppercase;
+  }
+
+  span.category {
+    background-color: $c_primary_active;
+    color: $c_on_primary;
+  }
+
+  // div.wrapper {
+  // }
+}
+
+.result-stats {
+  z-index: 10;
+  position: absolute;
+  align-self: start;
+  justify-self: start;
+  display: flex;
+  margin-left: 10px;
+  margin-top: 30px;
+
+  &.menu-open {
+    opacity: $dim_result_stats_on_menu_open;
+  }
+
+  .stats-panel {
+    color: $c_primary;
+    @include textProps();
+
+    span.category {
+      background-color: $c_primary_active;
+      color: $c_on_primary;
+    }
+
+    div.wrapper {
+      margin-bottom: 20px;
+    }
+  }
+}
+
+.result-list {
+  margin: 20px 10px 10px 10px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow-y: hidden;
+
+  .pathsHeader {
+    display: flex;
+    color: $c_primary;
+    border-bottom: 1px solid $c_primary;
+    @include textProps(0.8rem);
+
+    div:first-child {
+      width: 75px;
+    }
+  }
+
+  .pathsBody {
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    flex: 1;
+
+    .paths {
+      overflow-x: auto;
+      overflow-y: auto;
+      min-height: 200px;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+
+      &[class*="screen-width-"] {
+        .pathRow.row-width {
+          @include addPathResizeWidth(300, 0);
+          @include addPathResizeWidth(400, 0);
+          @include addPathResizeWidth(500, 0);
+          @include addPathResizeWidth(600, 0);
+          @include addPathResizeWidth(700, 0);
+          @include addPathResizeWidth(800, 0);
+          @include addPathResizeWidth(900, 0);
+          @include addPathResizeWidth(1000, 0);
+        }
+      }
+      &.screen-width-400 {
+        .pathRow.row-width {
+          @include addPathResizeWidth(400, 6px);
+          @include addPathResizeWidth(500, 8px);
+          @include addPathResizeWidth(600, 10px);
+          @include addPathResizeWidth(700, 11px);
+          @include addPathResizeWidth(800, 12px);
+          @include addPathResizeWidth(900, 13px);
+          @include addPathResizeWidth(1000, 14px);
+        }
+      }
+      &.screen-width-500 {
+        .pathRow.row-width {
+          @include addPathResizeWidth(400, 3px);
+          @include addPathResizeWidth(500, 6px);
+          @include addPathResizeWidth(600, 8px);
+          @include addPathResizeWidth(700, 10px);
+          @include addPathResizeWidth(800, 11px);
+          @include addPathResizeWidth(900, 12px);
+          @include addPathResizeWidth(1000, 13px);
+        }
+      }
+      &.screen-width-600 {
+        .pathRow.row-width {
+          @include addPathResizeWidth(500, 3px);
+          @include addPathResizeWidth(600, 6px);
+          @include addPathResizeWidth(700, 8px);
+          @include addPathResizeWidth(800, 10px);
+          @include addPathResizeWidth(900, 11px);
+          @include addPathResizeWidth(1000, 12px);
+        }
+      }
+      &.screen-width-700 {
+        .pathRow.row-width {
+          @include addPathResizeWidth(600, 3px);
+          @include addPathResizeWidth(700, 6px);
+          @include addPathResizeWidth(800, 8px);
+          @include addPathResizeWidth(900, 10px);
+          @include addPathResizeWidth(1000, 11px);
+        }
+      }
+      &.screen-width-800 {
+        .pathRow.row-width {
+          @include addPathResizeWidth(700, 3px);
+          @include addPathResizeWidth(800, 6px);
+          @include addPathResizeWidth(900, 8px);
+          @include addPathResizeWidth(1000, 10px);
+        }
+      }
+      &.screen-width-900 {
+        .pathRow.row-width {
+          @include addPathResizeWidth(800, 3px);
+          @include addPathResizeWidth(900, 6px);
+          @include addPathResizeWidth(1000, 8px);
+        }
+      }
+      &.screen-width-1000 {
+        .pathRow.row-width {
+          @include addPathResizeWidth(900, 3px);
+          @include addPathResizeWidth(1000, 6px);
+        }
+      }
+
+      .pathRow {
+        line-height: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        color: $c_primary;
+        border-bottom: 1px solid rgba($c_primary, 0.5);
+        @include textProps(0.8rem);
+        @include unselectable();
+
+        &:hover {
+          background-color: $c_on_primary;
+        }
+        // step count
+        div:first-child {
+          width: 75px;
+          margin: 0 -10px 0 10px;
+          font-size: 1rem;
+          color: $c_primary_active;
+        }
+        // direction pills
+        .pathDirection {
+          flex: 1;
+          span {
+            background-color: $c_background;
+            border: 1px solid $c_primary;
+            border-radius: 25px;
+            padding: 1px 5px;
+            cursor: default;
+            &:first-child {
+              margin-left: 0;
+            }
+            &:last-child {
+              margin-right: 0;
+            }
+          }
+        }
+
+        &.selected {
+          background-color: $c_border_focus;
+          color: $c_on_primary;
+          div:first-child {
+            color: $c_on_primary;
+          }
+          .pathDirection {
+            span {
+              background-color: $c_border_focus;
+              border-color: $c_on_primary;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .pathFooter {
+    height: 40px;
+    line-height: 40px;
+    border-top: 1px solid $c_primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $c_primary;
+    @include textProps();
+    text-transform: uppercase;
+
+    .inputContainer {
+      margin: 0 5px;
+    }
+
+    .maxPageNum {
+      padding-left: 5px;
+    }
+  }
+}
+
+.result-stats,
+.result-list {
+  &.hidden {
+    display: none;
+  }
+}
+
+// ---------------------- LOADER -----------------------
+.loader {
+  border: 5px solid $c_primary_active;
+  border-bottom: 5px solid $c_secondary;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  -webkit-animation: spin 2s linear infinite;
+  /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

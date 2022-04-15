@@ -1,9 +1,13 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import counterReducer from '../features/counter/counterSlice';
+import mazeReducer from '../features/maze/mazeSlice';
+import gridReducer from '../features/grid/gridSlice';
 
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
+    maze: mazeReducer,
+    grid: gridReducer,
   },
 });
 

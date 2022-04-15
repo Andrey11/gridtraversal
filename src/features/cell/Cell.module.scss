@@ -1,0 +1,198 @@
+@import 'src/index.module.scss';
+
+.Cell {
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+    text-align: center;
+    line-height: 50px;
+    display: grid;
+
+    &Info {
+        z-index: 0;
+        .CellValue {
+            position: absolute;
+            z-index: 1;
+            opacity: 0;
+            background-color: $c_on_primary;
+            color: $c_primary;
+            border: 1px solid $c_primary;
+            border-radius: 25px;
+            text-align: center;
+            padding: 1px 6px;
+        }
+
+        .PositionLabel {
+            position: absolute;
+            opacity: 0.2;
+            z-index: 2;
+            font-size: 0.5rem;
+            line-height: 0.5rem;
+            border: 1px solid rgba(209, 239, 209, 1);
+            border-radius: 5px;
+            color: black;
+            background-color: rgba(209, 239, 209, 1);
+            margin: 3px 8px 0;
+            text-align: center;
+            max-width: 30px;
+            width: 100%;
+        }
+
+        &:hover {
+            .PositionLabel {
+                opacity: 0.7;
+            }
+        }
+    }
+
+    .DirectionInfo {
+        position: absolute;
+        width: $cell_width;
+        height: $cell_height;
+        z-index: 0;
+
+        line {
+            @include createTransition(stroke-opacity, 0.2s);
+            stroke: $c_primary;
+            stroke-width: 2px;
+            stroke-opacity: 0;
+        }
+
+        @include lineStrokeProps("up");
+        @include lineStrokeProps("right");
+        @include lineStrokeProps("down");
+        @include lineStrokeProps("left");
+    }
+
+    &:not([class*="path-"]) {
+        @include cellContent("\026AC");
+        &.hovered {
+            @include cellContent("\02726");
+        }
+
+        &.StartCell {
+            @include cellContent("\02690");
+        }
+
+        &.EndCell {
+            @include cellContent("\02691");
+        }
+
+        &.StartCell.EndCell {
+            @include cellContent("\02690\02691");
+        }
+    }
+
+    &[class*="path"] {
+        background-color: $c_transparent;
+        color: $c_primary;
+
+        .CellInfo {
+            span.CellValue {
+                @include createTransition(opacity, 0.2s);
+                display: inline;
+                position: static;
+                opacity: 0;
+            }
+            span.CellValue.selected {
+                opacity: 1;
+                @include createTransition(opacity, 0.4s);
+                &[class*="pos-"] {
+                    transition-delay: 0.6s;
+                }
+                @include createDelayTransitions(100);
+            }
+        }
+
+        &.StartCell {
+            .CellInfo {
+                span {
+                    background-color: $c_background;
+                    color: $c_primary;
+                }
+            }
+        }
+
+        &.EndCell {
+            .CellInfo {
+                span {
+                    background-color: $c_primary;
+                    color: $c_on_primary;
+                }
+            }
+        }
+    }
+}
+
+.Border {
+    width: $cell_width;
+    height: $cell_height;
+    z-index: 5;
+
+    @include borderHoverProps("uWallBoundary", "BorderTop") {
+        height: 8px;
+        margin-top: -5px;
+    }
+
+    @include borderHoverProps("dWallBoundary", "BorderBottom") {
+        margin-top: 45px;
+        height: 8px;
+    }
+
+    @include borderHoverProps("lWallBoundary", "BorderLeft") {
+        margin-left: -5px;
+        width: 8px;
+    }
+
+    @include borderHoverProps("rWallBoundary", "BorderRight") {
+        margin-left: 45px;
+        width: 8px;
+    }
+
+    &.lWall {
+        @include borderColorProps("Left", $c_primary);
+        &Boundary {
+            color: inherit;
+        }
+    }
+
+    &.rWall {
+        @include borderColorProps("Right", $c_primary);
+        &Boundary {
+            color: inherit;
+        }
+    }
+
+    &.uWall {
+        @include borderColorProps("Top", $c_primary);
+        &Boundary {
+            color: inherit;
+        }
+    }
+
+    &.dWall {
+        @include borderColorProps("Bottom", $c_primary);
+        &Boundary {
+            color: inherit;
+        }
+    }
+
+    &Left {
+        @include defaultBorderProps($horizontal: false);
+    }
+
+    &Top {
+        @include defaultBorderProps($horizontal: true);
+    }
+
+    &Bottom {
+        @include defaultBorderProps($horizontal: true);
+        margin-top: 48px;
+    }
+
+    &Right {
+        @include defaultBorderProps($horizontal: false);
+        margin-left: 48px;
+    }
+}
