@@ -1,4 +1,4 @@
-import { CellState } from "../cell/Cell.types";
+import { CellState } from '../cell/Cell.types';
 
 export type PositionData = {
     x: number;
@@ -14,6 +14,8 @@ export type MazeState = {
     selectedPath: string;
     paths: string[];
     resultScreenWidthType: number;
+    calculating: boolean;
+    loading?: boolean;
 };
 
-export type MoveDirection = "up" | "down" | "left" | "right";
+export type MoveDirection = 'up' | 'down' | 'left' | 'right';

@@ -5,6 +5,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: relative;
+  margin: 2em;
 }
 
 .Grid {
@@ -31,6 +33,19 @@
   &Boundary {
     background-color: $c_primary;
     padding: 2px;
-    margin: 2em;
+    // margin: 2em;
+  }
+  
+  &CalculatingOverlay {
+      position: absolute;
+      display: flex;
+      background-color: rgba(18, 28, 28, 0.25);
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      align-items: center;
+      justify-content: center;
   }
 }
+

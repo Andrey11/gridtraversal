@@ -1,5 +1,5 @@
-import { CellState, Move } from "../cell/Cell.types";
-import { MazeState, MoveDirection, PositionData } from "./Maze.types";
+import { CellState, Move, AdjacentDirectionType, DirectionNames } from '../cell/Cell.types';
+import { MoveDirection, PositionData } from './Maze.types';
 
 export const isBoundaryBorder = (
     cellId: string,
@@ -29,7 +29,7 @@ export const createMatrix = (width: number, height: number): CellState[] => {
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             const cell: CellState = {
-                positionLabel: "p_" + x + "-" + y,
+                positionLabel: 'p_' + x + '-' + y,
                 position: createPosition(x, y),
                 up: y > 0,
                 down: y + 1 < height,
@@ -52,48 +52,57 @@ export const convertToCellIndex = (cellId: string, numCellsPerRow: number): numb
     return parseInt(cellIndex[0]) + parseInt(cellIndex[1]) * numCellsPerRow;
 };
 
-export const getAdjacentCellId = (cellId: string, direction: string): string => {
+export const getAdjacentCellId = (cellId: string, direction: AdjacentDirectionType): string => {
     const cellIndex = cellId.split('_');
-    if (direction === 'left') {
-        return ((parseInt(cellIndex[0]) - 1) + "_" + cellIndex[1]);
-    } else if (direction === "right") {
-        return ((parseInt(cellIndex[0]) + 1) + "_" + cellIndex[1]);
-    } else if (direction === "top") {
-        return (cellIndex[0] + "_" + (parseInt(cellIndex[1]) - 1));
-    } else if (direction === "bottom") {
-        return (cellIndex[0] + "_" + (parseInt(cellIndex[1]) + 1));
+    if (direction === DirectionNames.DIRECTION_LEFT) {
+        return ((parseInt(cellIndex[0]) - 1) + '_' + cellIndex[1]);
+    } else if (direction === DirectionNames.DIRECTION_RIGHT) {
+        return ((parseInt(cellIndex[0]) + 1) + '_' + cellIndex[1]);
+    } else if (direction === DirectionNames.DIRECTION_TOP) {
+        return (cellIndex[0] + '_' + (parseInt(cellIndex[1]) - 1));
+    } else if (direction === DirectionNames.DIRECTION_BOTTOM) {
+        return (cellIndex[0] + '_' + (parseInt(cellIndex[1]) + 1));
     } else {
         return cellId;
     }
 
 };
 
-export const traverseMaze = (mazeState: MazeState) => {
+/**
+ * 
+ export function fetchCount(amount = 1) {
+  return new Promise<{ data: number }>((resolve) =>
+    setTimeout(() => resolve({ data: amount }), 500)
+  );
+}
+ */
+
+// export const traverseMaze = (mazeState: MazeState) => {
     // event.preventDefault();
 
     // resetMatrixVisitedState();
     // clearResultPanel();
     // clearGridUISelectedCells();
-    // mazeState.selectedPath = "";
+    // mazeState.selectedPath = '';
     // let traverseControls = event.target.parentNode;
-    // traverseControls.classList.add("searching");
+    // traverseControls.classList.add('searching');
 
-    setTimeout(() => {
-        let resultPromise = mazeTraversal(
-            mazeState.matrix,
-            mazeState.widthSize,
-            mazeState.heightSize,
-            mazeState.start,
-            mazeState.end
-        );
+//     setTimeout(() => {
+//         let resultPromise = mazeTraversal(
+//             mazeState.matrix,
+//             mazeState.widthSize,
+//             mazeState.heightSize,
+//             mazeState.start,
+//             mazeState.end
+//         );
 
-        resultPromise.then((...opts) => {
-            console.log("Resolved");
-            // traverseControls.classList.remove("searching");
-            // saveResult();
-        });
-    }, 300);
-};
+//         resultPromise.then((...opts) => {
+//             console.log('Resolved');
+//             // traverseControls.classList.remove('searching');
+//             // saveResult();
+//         });
+//     }, 300);
+// };
 
 /**
  * Returns a promise that is resolved when all possible solutions are found.
@@ -106,21 +115,27 @@ export const traverseMaze = (mazeState: MazeState) => {
  *
  * @returns {Promise} promise that will resolve when all solutions are found
  */
-const mazeTraversal = (
+export const mazeTraversal = (
     grid: CellState[],
     gridWidth: number,
     gridHeight: number,
     start: PositionData = {x: 0, y: 0},
     end: PositionData = { x: gridWidth-1, y: gridHeight-1 },
 ) => {
-    return new Promise((resolve, reject) => {
+    
+    
+    return new Promise<{ solutions: string[] }>((resolve, reject) => {
+        const myGrid = grid.map((cell: CellState) => {return {...cell}});
         let startIndex = gridWidth * start.y + start.x;
         let stack: Move[] = [];
         let successPaths: string[] = [];
         let path: string[] = [];
         let foundCount = 0;
 
-        stack.push({ to: grid[startIndex], from: grid[startIndex] });
+        let mv: Move = { to: myGrid[startIndex], from: myGrid[startIndex] };
+        stack.push(mv);
+
+        console.log('Solving maze: wxh = ' + gridWidth + 'x' + gridHeight);
 
         while (stack.length > 0) {
             let cellMove = stack.shift();
@@ -134,13 +149,13 @@ const mazeTraversal = (
                     cell.visited = true;
                     path.push(cell.positionLabel);
                     let steps = path.length;
-                    let str = steps + "|" + path.join(", ");
+                    let str = steps + '|' + path.join(', ');
                     successPaths.push(str);
                 } else if (!cell.visited) {
                     cell.visited = true;
                     path.push(cell.positionLabel);
                     // fetch all available moves
-                    availableCells = getAvailableMoves(grid, cell);
+                    availableCells = getAvailableMoves(myGrid, cell, gridWidth);
                     // insert in front of all moves on stack
                     stack = availableCells.concat(stack);
                 }
@@ -153,16 +168,16 @@ const mazeTraversal = (
                     // #2 has no available moves, in other words are stuck
                     // In both cases we want to backtrack to the next item on the stack
                     let nextMove = stack && stack.length > 0 ? stack[0] : null;
-                    walkbackToNextAvailableCell(grid, path, nextMove);
+                    walkbackToNextAvailableCell(myGrid, path, nextMove);
                 }
             }
         }
 
         // showResultsPanel(successPaths, true);
 
-        console.log("Found paths: " + foundCount);
-        console.log("End: " + path.toString());
-        resolve("success");
+        console.log('Found paths: ' + foundCount);
+        console.log('End: ' + path.toString());
+        resolve({ solutions: successPaths });
     });
 };
 
@@ -172,6 +187,7 @@ const mazeTraversal = (
  * and cell at direction has not been visited.
  *
  * @param {Cell[]} grid grid state data object
+ * @param {number} gridWidth current grid width 
  * @param {Cell} cell current cell (aka from cell)
  * @param {MoveDirection} direction direction to next cell
  *
@@ -179,6 +195,7 @@ const mazeTraversal = (
  */
 const getMoveForDirection = (
     grid: CellState[],
+    gridWidth: number,
     cell: CellState,
     direction: MoveDirection
 ): Move | null => {
@@ -186,22 +203,22 @@ const getMoveForDirection = (
     let yOffset = cell.position.y;
     let isBlocked = false;
 
-    if (direction === "up") {
+    if (direction === 'up') {
         yOffset -= 1;
         isBlocked = !cell.up;
-    } else if (direction === "down") {
+    } else if (direction === 'down') {
         yOffset += 1;
         isBlocked = !cell.down;
-    } else if (direction === "left") {
+    } else if (direction === 'left') {
         xOffset -= 1;
         isBlocked = !cell.left;
-    } else if (direction === "right") {
+    } else if (direction === 'right') {
         xOffset += 1;
         isBlocked = !cell.right;
     }
 
     // let offset = mazeState.widthSize * yOffset + xOffset;
-    let offset = 4 * yOffset + xOffset;
+    let offset = gridWidth * yOffset + xOffset;
     let adjacentCell: CellState = grid[offset];
 
     if (!isBlocked && adjacentCell && !adjacentCell.visited) {
@@ -217,15 +234,16 @@ const getMoveForDirection = (
  *
  * @param {Cell[]} grid grid state data object
  * @param {Cell} cell current cell (aka from cell)
+ * @param {number} gridWidth current grid width
  *
  * @returns {Move[]} available moves from given cell
  */
-const getAvailableMoves = (grid: CellState[], cell: CellState): Move[] | [] => {
-    let availCells: Move[] = []
-    const upMove = getMoveForDirection(grid, cell, "up");
-    const downMove = getMoveForDirection(grid, cell, "down");
-    const leftMove = getMoveForDirection(grid, cell, "left");
-    const rightMove = getMoveForDirection(grid, cell, "right");
+const getAvailableMoves = (grid: CellState[], cell: CellState, gridWidth: number): Move[] | [] => {
+    let availCells: Move[] = [];
+    const upMove = getMoveForDirection(grid, gridWidth, cell, 'up');
+    const downMove = getMoveForDirection(grid, gridWidth, cell, 'down');
+    const leftMove = getMoveForDirection(grid, gridWidth, cell, 'left');
+    const rightMove = getMoveForDirection(grid, gridWidth, cell, 'right');
 
     if (upMove) {
         availCells.push(upMove);
@@ -273,8 +291,8 @@ const walkbackToNextAvailableCell = (
             pathToWalkback[pathToWalkback.length - 1]
         );
         let found = false;
-        if (nextMove.from?.positionLabel === previousCell?.positionLabel) {
-            let targetCell = getCellByPosition(grid, nextMove.to?.positionLabel || '');
+        if (previousCell && nextMove.from.positionLabel === previousCell.positionLabel) {
+            let targetCell = getCellByPosition(grid, nextMove.to.positionLabel || '');
             found = !targetCell?.visited;
         }
 

@@ -1,4 +1,4 @@
-import { PositionData } from "../maze/Maze.types";
+import { PositionData } from '../maze/Maze.types';
 
 export type CellState = {
     positionLabel: string;
@@ -17,3 +17,12 @@ export type Move = {
     to: CellState;
     from: CellState;
 };
+
+export const DirectionNames = {
+    DIRECTION_TOP: 'top',
+    DIRECTION_BOTTOM: 'bottom',
+    DIRECTION_LEFT: 'left',
+    DIRECTION_RIGHT: 'right',
+};
+
+export type AdjacentDirectionType = typeof DirectionNames[keyof typeof DirectionNames]; 

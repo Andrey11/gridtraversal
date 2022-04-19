@@ -3,23 +3,54 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import Grid from '../grid/Grid';
 import {
     createMaze,
+    getMaze,
+    getMazeHeightSize,
+    getMazeWidthSize,
     initialMazeState,
+    // isCalculating,
     isMazeMatrixEmpty,
+    traverseMazeLogic,
 } from './mazeSlice';
 import Button from 'react-bootstrap/Button';
 
 import styles from './Maze.module.scss';
+import GridSettings from '../grid/settings/GridSettings';
+import { createMatrix, createPosition } from './Maze.helpers';
 
 const Maze: React.FunctionComponent = () => {
 
     const dispatch = useAppDispatch();
-    const isEmptyMatrix = useAppSelector(isMazeMatrixEmpty);
-    
+    // const [loaded, setLoaded] = useState(false);
+
+    const gridWidth = useAppSelector(getMazeWidthSize);
+    const gridHeight = useAppSelector(getMazeHeightSize);
+    const isEmptyGrid = useAppSelector(isMazeMatrixEmpty)
+    const mazeState = useAppSelector(getMaze);
+    // const calculating = useAppSelector(isCalculating);
+
+
+    console.log('Maze main');
+
     useEffect(() => {
-        if (isEmptyMatrix) {      
-            dispatch(createMaze(initialMazeState));
+        if (isEmptyGrid) {
+            console.log('Creating maze');
+            // setLoaded(true);
+            let myMaze = { ...initialMazeState };
+            myMaze.matrix = createMatrix(4, 4);
+            myMaze.widthSize = 4;
+            myMaze.heightSize = 4;
+            myMaze.start = createPosition(0, 0);
+            myMaze.end = createPosition(3, 3);
+            dispatch(createMaze(myMaze));
         }
-    }, [dispatch, isEmptyMatrix]);
+    }, [dispatch, isEmptyGrid]);
+
+    // useEffect(() => {
+    //     if (calculating) {
+    //         console.log('calculating state change');
+    //         dispatch(traverseMazeLogic(mazeState));
+    //     }
+    // }, [dispatch, calculating]);
 
 
     const onResetClicked = () => {
@@ -29,7 +60,8 @@ const Maze: React.FunctionComponent = () => {
 
     const onTraverseClicked = () => {
         console.log('On Traverse clicked');
-        dispatch(createMaze(initialMazeState));
+        // dispatch(beginMazeTraversal(true));
+        dispatch(traverseMazeLogic(mazeState));
     }
 
     // const maze: MazeState = useAppSelector(getMaze);
@@ -113,11 +145,12 @@ const Maze: React.FunctionComponent = () => {
 
     return (
         <div className={styles.MazePage}>
-            {!isEmptyMatrix && <Grid />}
+            <Grid />
             <div>
-                <Button variant="secondary" onClick={onResetClicked}>Reset</Button>{ ' ' }
+                <Button variant="secondary" onClick={onResetClicked}>Reset</Button>{' '}
                 <Button variant="primary" onClick={onTraverseClicked}>Traverse</Button>{' '}
             </div>
+            <GridSettings heightSize={gridHeight.toString()} widthSize={gridWidth.toString()} />
         </div>
 
     );

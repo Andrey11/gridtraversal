@@ -1,10 +1,10 @@
-import { PositionData } from "../maze/Maze.types";
+import { PositionData } from '../maze/Maze.types';
 
 export type RandomWallType =
-    | "randomWallsSmall"
-    | "randomWallsNone"
-    | "randomWallsLarge"
-    | "randomWallsCustom";
+    | 'randomWallsSmall'
+    | 'randomWallsNone'
+    | 'randomWallsLarge'
+    | 'randomWallsCustom';
 
 export type GridState = {
     widthValue: number;
